@@ -1,0 +1,66 @@
+// implementation of semaphore
+
+semaphore{
+    value                 // holds the current value of the semaphore
+    process list          // it is the list of process waiting for execution
+}
+
+// functions used on semaphore
+
+wait(semaphore s){
+    s.value = s.value - 1
+
+    if(s.value < 0){
+        add process to s.list
+        block
+    }
+}
+
+
+signal(semaphore s){
+    s.value = s.value + 1
+
+    if(s.value <= 0){
+        wakeup process removed process from s.list
+    }
+}
+
+// Initialisation
+
+semaphore mutex(1);
+semaphore write(1);
+semaphore readhold(1);
+integer counter(0);
+
+// Reader Part
+
+wait(readhold)
+wait(mutex)
+counter++
+if(counter==1) wait(wrt)
+signal(mutex)
+signal(readhold)
+
+/*
+Read
+Section
+*/
+
+wait(mutex)
+counter--
+if(counter==0) signal(wrt)
+signal(mutex)
+
+
+// Writer Part
+
+wait(readhold)
+wait(wrt)
+
+/*
+Write
+Section
+*/
+
+wait(wrt)
+wait(readhold)
